@@ -1,0 +1,15 @@
+{
+	email admin@itsumi.moe
+}
+
+erika.itsumi.moe {
+	reverse_proxy caddy-static:80
+}
+
+rimgo.itsumi.moe {
+	reverse_proxy rimgo:3000
+
+	log {
+		output discard
+	}
+}
