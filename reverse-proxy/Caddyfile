@@ -1,53 +1,71 @@
 {
 	email admin@itsumi.moe
-    layer4 {
-        # never try to bind to the ports the HTTP app is bound to,
-        # use listener (TCP) and/or packet connection (UDP) wrappers instead;
-        # see also: https://github.com/mholt/caddy-l4/blob/master/docs/servers.md
 
-        # the following block will cause issues and won't work correctly,
-        # if the HTTP app listens to port 443 which is the default HTTPS port
-        # tcp/:443 {
-        #     ...
-        # }
+	layer4 {
+		:25565 {
+			route {
+				proxy {
+					upstream minecraft-server:25565
+				}
+			}
+		}
+		udp/:25565 {
+			route {
+				proxy {
+					upstream minecraft-server:25565
+				}
+			}
+		}
+	}
 
-        # the following block will cause issues and won't work correctly,
-        # unless HTTP/3 is disabled for the HTTP app listening to port 443
-        # udp/:443 {
-        #     ...
-        # }
-	    # while `:443` after the `servers` directive below is optional, it makes sense
-	    # if the HTTP app listens to multiple ports and the configuration given below
-	    # should be applicable to one of them exclusively;
-	    # see also: https://caddyserver.com/docs/caddyfile/options#server-options
-	    servers :443 {
-	        # listener wrappers defined below can only handle TCP traffic, e.g. DNS, HTTP, TLS, etc.
-		    listener_wrappers {
+	# never try to bind to the ports the HTTP app is bound to,
+	# use listener (TCP) and/or packet connection (UDP) wrappers instead;
+	# see also: https://github.com/mholt/caddy-l4/blob/master/docs/servers.md
+
+	# the following block will cause issues and won't work correctly,
+	# if the HTTP app listens to port 443 which is the default HTTPS port
+	# tcp/:443 {
+	#     ...
+	# }
+
+	# the following block will cause issues and won't work correctly,
+	# unless HTTP/3 is disabled for the HTTP app listening to port 443
+	# udp/:443 {
+	#     ...
+	# }
+	# while `:443` after the `servers` directive below is optional, it makes sense
+	# if the HTTP app listens to multiple ports and the configuration given below
+	# should be applicable to one of them exclusively;
+	# see also: https://caddyserver.com/docs/caddyfile/options#server-options
+	servers :443 {
+		listener_wrappers {
+			layer4 {
+				# listener wrappers defined below can only handle TCP traffic, e.g. DNS, HTTP, TLS, etc.
 				@git_ssh ssh
 				route @git_ssh {
-					proxy forjejo:22
+					proxy forgejo:22
 				}
-	            tls
-	        }
+			}
+			tls
+		}
 
-	        packet_conn_wrappers {
-	        	layer4 {
-					@minecraft udp sni minecraft.itsumi.moe
-	        		route @minecraft {
-	        			proxy minecraft:19132
-	        		}	
-		        }
-	        }
-        }
-    }
+		#packet_conn_wrappers {
+		#	layer4 {
+		#		# UDP traffic
+		#		@minecraft udp sni minecraft.itsumi.moe minecraft.localhost
+		#		route @minecraft {
+		#			echo
+		#		}
+		#	}
+		#}
+	}
 }
 
-git.isumi.moe {
-	reverse_proxy forgejo:80
-}
+#git.localhost {
+#	reverse_proxy forgejo:80
+#}
 
-
-rimgo.itsumi.moe {
+rimgo.localhost {
 	reverse_proxy rimgo:3000
 
 	log {
@@ -55,12 +73,12 @@ rimgo.itsumi.moe {
 	}
 }
 
-erika.itsumi.moe {
+erika.localhost {
 	rewrite /erika/${path}
 	reverse_proxy caddy-static:80
 }
 
-itsumi.moe {
+itsumi.localhost {
 	rewrite /main-page/{path}
 	reverse_proxy caddy-static:80
 }
