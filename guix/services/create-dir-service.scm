@@ -1,10 +1,9 @@
-(define-module (holo create-directories)
+(define-module (services create-dir-service)
   #:use-module (gnu services)
   #:use-module (gnu services base)
   #:use-module (guix gexp)
   #:use-module (guix records)
   #:use-module (guix build utils)
-  #:use-module (ice-9 posix)
   #:export (create-directory
             create-directory?
             create-directory-directory
@@ -20,17 +19,14 @@
   (mode      create-directory-mode))
 
 (define (create-directories-activation config)
-  (with-imported-modules '((guix build utils)
-                           (ice-9 posix))
+  (with-imported-modules '((guix build utils))
     #~(begin
-        (use-modules (guix build utils)
-                     (ice-9 posix))
-
+        (use-modules (guix build utils))
         (for-each
          (lambda (entry)
-           (let* ((dir  #$(create-directory-directory entry))
-                  (user #$(create-directory-user entry))
-                  (mode #$(create-directory-mode entry))
+           (let* ((dir  (create-directory-directory entry))
+                  (user (create-directory-user entry))
+                  (mode (create-directory-mode entry))
                   (pw   (getpwnam user)))
              (mkdir-p dir)
              (chown dir (passwd:uid pw) (passwd:gid pw))

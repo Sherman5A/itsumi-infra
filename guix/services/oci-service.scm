@@ -1,17 +1,21 @@
-(define-module (oci-service)
+(define-module (services oci-service)
   #:use-module (gnu services)
-  #:use-module (gnu services docker)
-  #:use-module (gnu services oci)
+  #:use-module (gnu services containers)
   #:use-module (gnu packages)
-  #:use-module (guix))
+  #:use-module (guix)
+  #:export (oci-podman-configuration
+	    oci-provisioning-service))
 
-(define oci-provisioning-service)
-(simple-service 'oci-provisioning
-  oci-service-type
+(define oci-podman-configuration
   (oci-configuration
-    (runtime "podman")
+    (runtime 'podman)
     (user "run")
-    (runtime-extra-arguments `("--userns=auto")))
+    (runtime-extra-arguments `("--userns=auto"))))
+  
+(define oci-provisioning-service
+(simple-service
+ 'oci-provisioning
+  oci-service-type
   (oci-extension
     (networks
      (list
@@ -24,13 +28,8 @@
      (list
       ;; caddy-reverse-proxy
       (oci-container-configuration
-       (name "caddy-reverse-proxy")
-       (build
-        (oci-build-configuration
-         (context "reverse-proxy")
-         (dockerfile "Containerfile")))
-       (restart-policy 'unless-stopped)
-       (networks '("public" "static" "rimgo" "minecraft"))
+       (image "docker.io/shermankw:latest")
+       (network "public static rimgo minecraft")
        (ports
         '(("8080" . "80")
           ("8443" . "443")
@@ -41,10 +40,9 @@
 
       ;; rimgo
       (oci-container-configuration
-       (name "rimgo")
        (image "codeberg.org/rimgo/rimgo:1.4.2")
        (network "rimgo")
-       (expose '("3000"))
+       (ports '(("3000". "3000")))
        (environment
         '(("PRIVACY_NOT_COLLECTED" . "1")
           ("PRIVACY_COUNTRY" . "Germany")
@@ -53,12 +51,9 @@
 
       ;; minecraft-server
       (oci-container-configuration
-       (name "minecraft-server")
        (image "itzg/minecraft-server:stable-java25-alpine")
-       (tty? #t)
-       (stdin-open? #t)
        (network "minecraft")
-       (expose '("25565"))
+       (ports '(("25565" . "25565")))
        (environment
         '(("EULA" . "TRUE")
           ("VERSION" . "1.20.4")
@@ -74,8 +69,6 @@
 
       ;; caddy-static
       (oci-container-configuration
-       (name "caddy-static")
        (image "shermankw/itsumi:main")
-       (restart-policy 'unless-stopped)
        (network "static")
-       (expose '("80")))))))
+       (ports '(("3001" . "30001")))))))))

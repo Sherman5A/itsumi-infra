@@ -1,11 +1,13 @@
-(use-service-modules networking ssh containers)
-(use-package-modules bootloaders)
-(use-modules (gnu machine)
+(use-modules (gnu)
+             (gnu machine)
              (gnu machine hetzner)
-             (oci-service)
-             (holo create-directories)
+             (services oci-service)
+             (services create-dir-service)
              (gnu system accounts))
+(use-service-modules networking ssh sysctl)
+(use-package-modules bootloaders)
 
+(define server-type "cx23")
 
 (define %new-base-services
   (modify-services %base-services
@@ -31,9 +33,9 @@
 
 (define %system
   (operating-system
-   (inherit %hetzner-os-x86)
+   (inherit (make-hetzner-os server-type))
    (host-name "myuri")
-   (users (cons (user-account
+   (users (append (list (user-account
                 (name "kraft")
                 (comment "")
                 (group "users")
@@ -42,17 +44,19 @@
                 (user-account
                 (name "run")
                 (comment "")
-                (supplementary-groups '("cgroup")))
+		(group "users")
+                (supplementary-groups '("cgroup"))))
+		
                %base-user-accounts))
 
    (services
-    (append (list (service dhcp-client-service-type)
+    (append (list (service dhcpd-service-type)
                   (service ntp-service-type )
                   (service openssh-service-type
                       (openssh-configuration
                           (openssh openssh-sans-x)
                           (permit-root-login #t)
-                          (password-authentication #f)
+                          (password-authentication? #f)
                           (port-number 2222)
                           (authorized-keys
                             `(("kraft", (local-file "/home/jake/.ssh/hetzner.pub"))))))
@@ -127,15 +131,20 @@ table inet nat {
            (directory "/var/log/caddy")
            (user "run")
            (mode #o755))))
-       )
-    (list oci-provisioning-service)
-            %new-base-services))))
+    (service oci-service-type
+      %oci-podman-configuration
+    )
+    %oci-provisioning-service
+
+
+    
+    %new-base-services)))))
+  
 
 (list (machine
        (operating-system %system)
        (environment hetzner-environment-type)
        (configuration (hetzner-configuration
-                       (server-type "cx23")
-                       (system "x86_64-linux")
+                       (server-type server-type)
                        (ssh-key "/home/jake/.ssh/hetzner")
                        (location "fsn1")))))
