@@ -5,14 +5,14 @@
 		:25565 {
 			route {
 				proxy {
-					upstream minecraft-server:25565
+					upstream podman-minecraft-server:25565
 				}
 			}
 		}
 		udp/:25565 {
 			route {
 				proxy {
-					upstream minecraft-server:25565
+					upstream podman-minecraft-server:25565
 				}
 			}
 		}
@@ -43,8 +43,12 @@
 				# listener wrappers defined below can only handle TCP traffic, e.g. DNS, HTTP, TLS, etc.
 				@git_ssh ssh
 				route @git_ssh {
-					proxy forgejo:22
+					proxy podman-forgejo:22
 				}
+
+				route {
+				      tls
+			        }
 			}
 			tls
 		}
@@ -62,23 +66,22 @@
 }
 
 #git.localhost {
-#	reverse_proxy forgejo:80
+#	reverse_proxy podman-forgejo:80
 #}
 
-rimgo.erika.moe {
-	reverse_proxy rimgo:3000
+rimgo.itsumi.moe {
+	reverse_proxy podman-rimgo:3000
 
 	log {
 		output discard
 	}
 }
 
-erika.erika.moe {
-	rewrite /erika/${path}
-	reverse_proxy caddy-static:80
+itsumi.moe {
+	#rewrite /erika/${path}
+	reverse_proxy podman-itsumi:80
 }
 
-itsumi.erika.moe {
-	rewrite /main-page/{path}
-	reverse_proxy caddy-static:80
+erika.itsumi.moe {
+	reverse_proxy podman-itsumi:80
 }

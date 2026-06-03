@@ -80,15 +80,12 @@ table inet filter {
         # Allow loopback
         iif lo accept
 
-        # Block incoming SSH on port 22
+        # Allow incoming SSH on port 22
         tcp dport 22 accept
 
-        # Allow SSH on port 2222
-        tcp dport 2222 accept
-
         # Allow HTTP and HTTPS
-        tcp dport 80 accept
-        tcp dport 443 accept
+        tcp dport 8080 accept
+        tcp dport 8443 accept
 
         # Allow Minecraft
         tcp dport 25565 accept

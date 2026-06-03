@@ -52,7 +52,6 @@
       (oci-container-configuration
        (image "itzg/minecraft-server:stable-java25-alpine")
        (network "minecraft")
-       (ports '(("25565" . "25565")))
        (environment
         '(("EULA" . "TRUE")
           ("VERSION" . "1.20.4")
