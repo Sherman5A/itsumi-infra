@@ -4,8 +4,8 @@
              (services oci-service)
              (services create-dir-service)
              (gnu system accounts))
-(use-service-modules networking ssh sysctl)
-(use-package-modules bootloaders)
+(use-service-modules networking ssh sysctl security dbus containers desktop)
+(use-package-modules bootloaders ssh)
 
 (define server-type "cx23")
 
@@ -48,23 +48,25 @@
                 (supplementary-groups '("cgroup"))))
                %base-user-accounts))
    (services
-    (append (list (service dhcpd-service-type)
-                  (service ntp-service-type )
+    (cons* (service dhcp-client-service-type)
+           (service ntp-service-type)
+	   (service dbus-root-service-type)
+           (service elogind-service-type)
                   (service openssh-service-type
                       (openssh-configuration
                           (openssh openssh-sans-x)
                           (permit-root-login #t)
                           (password-authentication? #f)
-                          (port-number 2222)
+                          (port-number 22)
                           (authorized-keys
                             `(("kraft", (local-file "/home/jake/.ssh/hetzner.pub"))))))
-                  (service fail2ban-service-type
-                    (fail2ban-configuration
-                      (extra-jails
-                       (list
-                         (fail2ban-jail-configuration
-                          (name "sshd")
-                            (enabled? #t))))))
+                  ;;(service fail2ban-service-type
+                  ;;  (fail2ban-configuration
+                  ;;    (extra-jails
+                  ;;     (list
+                  ;;      (fail2ban-jail-configuration
+                  ;;        (name "sshd")
+                  ;;        (enabled? #t))))))
                   (service nftables-service-type
                     (nftables-configuration
                       (ruleset (plain-file "nftables.rules" "
@@ -79,7 +81,7 @@ table inet filter {
         iif lo accept
 
         # Block incoming SSH on port 22
-        tcp dport 22 drop
+        tcp dport 22 accept
 
         # Allow SSH on port 2222
         tcp dport 2222 accept
@@ -130,15 +132,16 @@ table inet nat {
            (user "podman-runner")
            (mode #o755))))
     (service oci-service-type
-      %oci-podman-configuration
+      oci-podman-configuration
     )
-    %oci-provisioning-service
-    %new-base-services)))))
+    oci-provisioning-service
+    %new-base-services))))
   
 (list (machine
        (operating-system %system)
        (environment hetzner-environment-type)
        (configuration (hetzner-configuration
                        (server-type server-type)
-                       (ssh-key "/home/jake/.ssh/hetzner")
+                       (ssh-key "/home/jake/.ssh/hetzner-test")
+                       (ssh-public-key "/home/jake/.ssh/hetnzer-test.pub")
                        (location "fsn1")))))
