@@ -9,8 +9,7 @@
 (define oci-podman-configuration
   (oci-configuration
     (runtime 'podman)
-    (user "podman-runner")
-    (runtime-extra-arguments `("--userns=auto"))))
+    (user "oci-runner")))
   
 (define oci-provisioning-service
 (simple-service
@@ -28,13 +27,13 @@
      (list
       ;; caddy-reverse-proxy
       (oci-container-configuration
-       (image "docker.io/shermankw:latest")
-       (network "public static rimgo minecraft")
+       (image "docker.io/shermankw/itsumi-proxy:latest")
+       (network "public,static,rimgo,minecraft")
        (ports
-        '(("8080" . "80")
-          ("8443" . "443")
-          ("25565" . "25565")
-          ("25565/udp" . "25565/udp")))
+        (list '("8080" . "80")
+          '("8443" . "443")
+          '("25565" . "25565")
+          '("25565" . "25565/udp")))
        (volumes
         '("/var/lib/caddy:/data")))
 

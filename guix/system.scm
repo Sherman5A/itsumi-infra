@@ -44,7 +44,7 @@
                 (user-account
                 (name "podman-runner")
                 (comment "")
-		            (group "users")
+		(group "users")
                 (supplementary-groups '("cgroup"))))
                %base-user-accounts))
    (services
@@ -114,22 +114,23 @@ table inet nat {
     (service rootless-podman-service-type
       (rootless-podman-configuration
         (subgids
-          (list (subid-range (name "podman-runner"))))
+          (list (subid-range (name "oci-runner"))))
         (subuids
-          (list (subid-range (name "podman-runner"))))))
+         (list (subid-range (name "oci-runner"))))))
+    (service iptables-service-type)
     (service create-directories-service-type
       (list
         (create-directory
            (directory "/var/lib/forgejo")
-           (user "podman-runner")
+           (user "oci-runner")
            (mode #o755))
           (create-directory
            (directory "/var/lib/minecraft")
-           (user "podman-runner")
+           (user "oci-runner")
            (mode #o755))
           (create-directory
-           (directory "/var/log/caddy")
-           (user "podman-runner")
+           (directory "/var/lib/caddy")
+           (user "oci-runner")
            (mode #o755))))
     (service oci-service-type
       oci-podman-configuration

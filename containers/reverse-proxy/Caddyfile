@@ -65,7 +65,7 @@
 #	reverse_proxy forgejo:80
 #}
 
-rimgo.localhost {
+rimgo.erika.moe {
 	reverse_proxy rimgo:3000
 
 	log {
@@ -73,12 +73,12 @@ rimgo.localhost {
 	}
 }
 
-erika.localhost {
+erika.erika.moe {
 	rewrite /erika/${path}
 	reverse_proxy caddy-static:80
 }
 
-itsumi.localhost {
+itsumi.erika.moe {
 	rewrite /main-page/{path}
 	reverse_proxy caddy-static:80
 }
