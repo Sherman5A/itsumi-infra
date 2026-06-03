@@ -9,7 +9,7 @@
 (define oci-podman-configuration
   (oci-configuration
     (runtime 'podman)
-    (user "run")
+    (user "podman-runner")
     (runtime-extra-arguments `("--userns=auto"))))
   
 (define oci-provisioning-service

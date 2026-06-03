@@ -42,13 +42,11 @@
                 (supplementary-groups '("wheel" "cgroup"
                                         "audio" "video")))
                 (user-account
-                (name "run")
+                (name "podman-runner")
                 (comment "")
-		(group "users")
+		            (group "users")
                 (supplementary-groups '("cgroup"))))
-		
                %base-user-accounts))
-
    (services
     (append (list (service dhcpd-service-type)
                   (service ntp-service-type )
@@ -114,33 +112,29 @@ table inet nat {
     (service rootless-podman-service-type
       (rootless-podman-configuration
         (subgids
-          (list (subid-range (name "run"))))
+          (list (subid-range (name "podman-runner"))))
         (subuids
-          (list (subid-range (name "run"))))))
+          (list (subid-range (name "podman-runner"))))))
     (service create-directories-service-type
       (list
         (create-directory
            (directory "/var/lib/forgejo")
-           (user "run")
+           (user "podman-runner")
            (mode #o755))
           (create-directory
            (directory "/var/lib/minecraft")
-           (user "run")
+           (user "podman-runner")
            (mode #o755))
           (create-directory
            (directory "/var/log/caddy")
-           (user "run")
+           (user "podman-runner")
            (mode #o755))))
     (service oci-service-type
       %oci-podman-configuration
     )
     %oci-provisioning-service
-
-
-    
     %new-base-services)))))
   
-
 (list (machine
        (operating-system %system)
        (environment hetzner-environment-type)
