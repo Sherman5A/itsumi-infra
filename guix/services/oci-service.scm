@@ -72,10 +72,9 @@
 	`(("SHIORI_HTTP_PORT" . "3001")
 	  ("SHIORI_DIR". "/data")))
        (volumes
-	`("/var/lib/shiori:/data")
-	 ("tmp:/tmp"))
+	`("/var/lib/shiori:/data")))
 
       ;; caddy-static
       (oci-container-configuration
        (image "shermankw/itsumi:main")
-       (network "static"))))))
+       (network "static")))))))

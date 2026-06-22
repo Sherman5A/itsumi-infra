@@ -48,7 +48,8 @@
                 (supplementary-groups '("cgroup"))))
                %base-user-accounts))
    (services
-    (cons* (service dhcp-client-service-type)
+    (cons* (service dhcpcd-service-type
+	     (dhcpcd-configuration))
            (service ntp-service-type)
 	   (service dbus-root-service-type)
            (service elogind-service-type)
