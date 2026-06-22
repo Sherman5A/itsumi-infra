@@ -36,3 +36,7 @@ itsumi.moe {
 erika.itsumi.moe {
 	reverse_proxy podman-itsumi:80
 }
+
+shiori.itsumi.moe {
+	reverse_proxy shiori:3001
+}

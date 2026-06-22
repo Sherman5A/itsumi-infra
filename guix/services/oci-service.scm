@@ -20,7 +20,8 @@
      (list
       (oci-network-configuration (name "public"))
       (oci-network-configuration (name "static") (internal? #t))
-      (oci-network-configuration (name "rimgo") (internal? #t))
+      (oci-network-configuration (name "shiori"))
+      (oci-network-configuration (name "rimgo"))
       (oci-network-configuration (name "minecraft"))))
 
     (containers
@@ -28,7 +29,7 @@
       ;; caddy-reverse-proxy
       (oci-container-configuration
        (image "docker.io/shermankw/itsumi-proxy:latest")
-       (network "public,static,rimgo,minecraft")
+       (network "public,static,shiori,rimgo,minecraft")
        (ports
         (list '("8080" . "80")
           '("8443" . "443")
@@ -41,7 +42,6 @@
       (oci-container-configuration
        (image "codeberg.org/rimgo/rimgo:1.4.2")
        (network "rimgo")
-       (ports '(("3000". "3000")))
        (environment
         '(("PRIVACY_NOT_COLLECTED" . "1")
           ("PRIVACY_COUNTRY" . "Germany")
@@ -54,7 +54,7 @@
        (network "minecraft")
        (environment
         '(("EULA" . "TRUE")
-          ("VERSION" . "1.20.4")
+          ("VERSION" . "26.1")
           ("TYPE" . "PAPER")
           ("ONLINE_MODE" . "true")
           ("USE_AIKAR_FLAGS" . "true")
@@ -65,8 +65,17 @@
        (volumes
         '("/var/lib/minecraft:/data")))
 
+      (oci-container-configuration
+       (image "ghcr.io/go-shiori/shiori:v1.8.0-2-g585ea34")
+       (network "shiori")
+       (environment
+	`(("SHIORI_HTTP_PORT" . "3001")
+	  ("SHIORI_DIR". "/data")))
+       (volumes
+	`("/var/lib/shiori:/data")
+	 ("tmp:/tmp"))
+
       ;; caddy-static
       (oci-container-configuration
        (image "shermankw/itsumi:main")
-       (network "static")
-       (ports '(("3001" . "30001")))))))))
+       (network "static"))))))

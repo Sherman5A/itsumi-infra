@@ -126,6 +126,10 @@ table inet nat {
            (user "oci-runner")
            (mode #o755))
           (create-directory
+           (directory "/var/lib/shiori")
+           (user "oci-runner")
+           (mode #o755))
+          (create-directory
            (directory "/var/lib/caddy")
            (user "oci-runner")
            (mode #o755))))
