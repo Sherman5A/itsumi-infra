@@ -131,6 +131,10 @@ table inet nat {
            (user "oci-runner")
            (mode #o755))
           (create-directory
+           (directory "/var/lib/linkding")
+           (user "oci-runner")
+           (mode #o755))
+          (create-directory
            (directory "/var/lib/caddy")
            (user "oci-runner")
            (mode #o755))))

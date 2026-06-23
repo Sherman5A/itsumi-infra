@@ -4,7 +4,7 @@
   #:use-module (gnu packages)
   #:use-module (guix)
   #:export (oci-podman-configuration
-	    oci-provisioning-service))
+      oci-provisioning-service))
 
 (define oci-podman-configuration
   (oci-configuration
@@ -21,6 +21,7 @@
       (oci-network-configuration (name "public"))
       (oci-network-configuration (name "static") (internal? #t))
       (oci-network-configuration (name "shiori"))
+      (oci-network-configuration (name "linkding"))
       (oci-network-configuration (name "rimgo"))
       (oci-network-configuration (name "minecraft"))))
 
@@ -29,7 +30,7 @@
       ;; caddy-reverse-proxy
       (oci-container-configuration
        (image "docker.io/shermankw/itsumi-proxy:latest")
-       (network "public,static,shiori,rimgo,minecraft")
+       (network "public,static,shiori,linkding,rimgo,minecraft")
        (ports
         (list '("8080" . "80")
           '("8443" . "443")
@@ -69,10 +70,18 @@
        (image "ghcr.io/go-shiori/shiori:v1.8.0-2-g585ea34")
        (network "shiori")
        (environment
-	`(("SHIORI_HTTP_PORT" . "3001")
-	  ("SHIORI_DIR". "/data")))
+        `(("SHIORI_HTTP_PORT" . "3001")
+         ("SHIORI_DIR". "/data")))
+       (volumes `("/var/lib/shiori:/data"))) 
+
+      (oci-container-configuration
+       (image "sissbruecker/linkding:1.45.0-alpine")
+       (network "linkding")
+       (environment
+        `("LD_FAVICON_PROVIDER". "https://icons.duckduckgo.com/ip3/{domain}.ico")))
        (volumes
-	`("/var/lib/shiori:/data")))
+        `("/var/lib/linkding:/etc/linkding/data")))
+
 
       ;; caddy-static
       (oci-container-configuration

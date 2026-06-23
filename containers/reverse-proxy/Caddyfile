@@ -17,7 +17,6 @@
 			}
 		}
 	}
-
 }
 
 rimgo.itsumi.moe {
@@ -39,4 +38,8 @@ erika.itsumi.moe {
 
 shiori.itsumi.moe {
 	reverse_proxy podman-shiori:3001
+}
+
+linkding.itsumi.moe {
+	reverse_proxy podman-linkding:9090
 }
