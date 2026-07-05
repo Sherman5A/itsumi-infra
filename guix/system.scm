@@ -91,9 +91,6 @@ table inet filter {
         # Allow Minecraft
         tcp dport 25565 accept
 
-        # Allow Matrix federation
-        tcp dport 8008 accept
-
         # Drop everything else
         drop
     }
@@ -137,10 +134,10 @@ table inet nat {
            (directory "/var/lib/linkding")
            (user "oci-runner")
            (mode #o755))
-	  (create-directory
-	   (directory "var/lib/tuwunel")
-	   (user "oci-runner")
-	   (mode #o755))
+          (create-directory
+           (directory "var/lib/tuwunel")
+           (user "oci-runner")
+           (mode #o755))
           (create-directory
            (directory "/var/lib/caddy")
            (user "oci-runner")

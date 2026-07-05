@@ -3,6 +3,7 @@
   #:use-module (gnu services containers)
   #:use-module (gnu packages)
   #:use-module (guix)
+  #:use-module (guix gexp)
   #:export (oci-podman-configuration
       oci-provisioning-service))
 
@@ -12,8 +13,7 @@
    (user "oci-runner")))
 
 (define tuwunel-registration-token
-  #~(begin
-      (or (getenv "GUIX_TUWUNEL_REGISTRATION_TOKEN") "")))
+  (or (getenv "GUIX_TUWUNEL_REGISTRATION_TOKEN") ""))
 
 (define oci-provisioning-service
 (simple-service
@@ -38,7 +38,6 @@
        (ports
         (list '("8080" . "80")
               '("8443" . "443")
-	      '("8448" . "8448")
               '("25565" . "25565")
               '("25565" . "25565/udp")))
        (volumes
@@ -48,10 +47,16 @@
        (image "docker.io/jevolk/tuwunel:v1.8.0")
        (network "matrix")
        (environment
-	`(("TUWUNEL_PORT" . "8008")
+	`(("TUWUNEL_SERVER_NAME" . "itsumi.moe")
+	  ("TUWUNEL_WELL_KNOWN__CLIENT" . "https://matrix.itsumi.moe")
+	  ("TUWUNEL_WELL_KNOWN__SERVER" . "matrix.itsumi.moe:443")
+	  ("TUWUNEL_PORT" . "8008")
+	  ("TUWUNEL_ADDRESS" . "0.0.0.0")
 	  ("TUWUNEL_DATABASE_PATH" . "/var/lib/tuwunel")
 	  ("TUWUNEL_ALLOW_REGISTRATION" . "true")
 	  ("TUWUNEL_REGISTRATION_TOKEN" . ,tuwunel-registration-token)
+	  ("TUWUNEL_ALLOW_FEDERATION" . "true")
+	  ("TUWUNEL_TRUSTED_SERVERS" . "[\"matrix.org\"]")
 	  ("TUWUNEL_IP_SOURCE" . "rightmost_x_forwarded_for")))
        (volumes
 	`("/var/lib/tuwunel:/var/lib/tuwunel")))
@@ -99,3 +104,5 @@
       (oci-container-configuration
        (image "shermankw/itsumi:main")
        (network "static")))))))
+
+tuwunel-registration-token

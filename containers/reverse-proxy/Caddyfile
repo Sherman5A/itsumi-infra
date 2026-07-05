@@ -19,12 +19,12 @@
 	}
 }
 
-matrix.itsumi.moe, matrix.itsumi.moe:8448 {
+matrix.itsumi.moe {
 	reverse_proxy podman-tuwunel:8008
 }
 
 itsumi.moe {
-	reverse_proxy /.well-known/matrix/* https://matrix.itsumi.moe {
+	reverse_proxy /.well-known/matrix/* podman-tuwunel:8008 {
 		header_up Host {upstream_hostport}
 	}
 }
