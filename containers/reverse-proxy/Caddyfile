@@ -19,12 +19,8 @@
 	}
 }
 
-rimgo.itsumi.moe {
-	reverse_proxy podman-rimgo:3000
-
-	log {
-		output discard
-	}
+matrix.itsumi.moe, matrix.itsumi.moe:8448 {
+  reverse_proxy podman-tuwunel:8008
 }
 
 itsumi.moe {

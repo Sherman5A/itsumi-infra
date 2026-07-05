@@ -44,14 +44,14 @@
                 (user-account
                 (name "podman-runner")
                 (comment "")
-		(group "users")
+                (group "users")
                 (supplementary-groups '("cgroup"))))
                %base-user-accounts))
    (services
     (cons* (service dhcpcd-service-type
-	     (dhcpcd-configuration))
+             (dhcpcd-configuration))
            (service ntp-service-type)
-	   (service dbus-root-service-type)
+           (service dbus-root-service-type)
            (service elogind-service-type)
                   (service openssh-service-type
                       (openssh-configuration
@@ -90,6 +90,9 @@ table inet filter {
 
         # Allow Minecraft
         tcp dport 25565 accept
+
+        # Allow Matrix federation
+        tcp dport 8008 accept
 
         # Drop everything else
         drop
@@ -134,6 +137,10 @@ table inet nat {
            (directory "/var/lib/linkding")
            (user "oci-runner")
            (mode #o755))
+	  (create-directory
+	   (directory "var/lib/tuwunel")
+	   (user "oci-runner")
+	   (mode #o755))
           (create-directory
            (directory "/var/lib/caddy")
            (user "oci-runner")
@@ -143,7 +150,7 @@ table inet nat {
     )
     oci-provisioning-service
     %new-base-services))))
-  
+
 (list (machine
        (operating-system %system)
        (environment hetzner-environment-type)
