@@ -20,12 +20,13 @@
 }
 
 matrix.itsumi.moe, matrix.itsumi.moe:8448 {
-  reverse_proxy podman-tuwunel:8008
+	reverse_proxy podman-tuwunel:8008
 }
 
 itsumi.moe {
-	#rewrite /erika/${path}
-	reverse_proxy podman-itsumi:80
+	reverse_proxy /.well-known/matrix/* https://matrix.itsumi.moe {
+		header_up Host {upstream_hostport}
+	}
 }
 
 erika.itsumi.moe {
