@@ -3,7 +3,8 @@
              (gnu machine hetzner)
              (services oci-service)
              (services create-dir-service)
-             (gnu system accounts))
+             (gnu system accounts)
+             (guix channels))
 (use-service-modules networking ssh sysctl security dbus containers desktop)
 (use-package-modules bootloaders ssh)
 
@@ -13,6 +14,11 @@
   (modify-services %base-services
     (guix-service-type config =>
       (guix-configuration (inherit config)
+        (channels (list
+                  (channel
+                    (name `guix)
+                    (url "https://git.guix.gnu.org/guix.git")
+                    (commit "e373af54a1843c1dd8f86766554eafcda35f825f"))))
         (substitute-urls (append (list
           "https://cache-test.guix.moe"
           "https://cache-fi.guix.moe/"
